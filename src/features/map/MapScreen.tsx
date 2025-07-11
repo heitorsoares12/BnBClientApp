@@ -1,102 +1,129 @@
-import React, {useRef, useState} from 'react';
-import {StyleSheet, View, TouchableOpacity, PermissionsAndroid, Platform} from 'react-native';
-import MapView, {MapType} from 'react-native-maps';
-import ClusteredMapView from 'react-native-map-clustering';
-import Icon from 'react-native-vector-icons/MaterialIcons';
-import {useUsers} from '../../contexts/UsersContext';
-import ClientMarker from './components/ClientMarker';
+import React, { useState, useMemo } from 'react';
+import { StyleSheet, View } from 'react-native';
+import MapboxGL from '@rnmapbox/maps';
+import { useUsers } from '../../contexts/UsersContext';
+import { User } from '../../types/user';
 import ClientModal from './components/ClientModal';
-import {User} from '../../types/user';
+import { FeatureCollection, Point } from 'geojson';
 
-const INITIAL_REGION = {
-  latitude: -14.2,
-  longitude: -51.9,
-  latitudeDelta: 30,
-  longitudeDelta: 30,
+MapboxGL.setAccessToken('SUA_CHAVE_DE_ACESSO_PUBLICA_DO_MAPBOX');
+
+const layerStyles = {
+  // Estilo para os clusters (círculos verdes)
+  cluster: {
+    circleColor: '#0B4B3C',
+    circleRadius: 20,
+    circleStrokeWidth: 2,
+    circleStrokeColor: 'white',
+  },
+  // Estilo para a contagem de pontos dentro do cluster
+  clusterCount: {
+    textField: ['get', 'point_count'],
+    textSize: 12,
+    textColor: 'white',
+  },
+  // Estilo para o ponto individual (quando não está em um cluster)
+  singlePoint: {
+    iconImage: ['get', 'avatar'], // Pega a URL do avatar da propriedade do ponto
+    iconSize: 0.5,
+    iconAllowOverlap: true,
+    iconAnchor: 'bottom',
+  },
 };
 
 const MapScreen = () => {
-  const {users} = useUsers();
-  const mapRef = useRef<MapView>(null);
-  const [mapType, setMapType] = useState<MapType>('standard');
-  const [selected, setSelected] = useState<User | null>(null);
+  const { users } = useUsers();
+  const [modalUser, setModalUser] = useState<User | null>(null);
 
-  const toggleMapType = () => {
-    setMapType(prev => (prev === 'standard' ? 'hybrid' : 'standard'));
-  };
+  // Converte a lista de usuários para o formato GeoJSON, que o Mapbox entende.
+  // Usamos useMemo para performance, evitando recalcular isso a cada renderização.
+  const geoJsonSource = useMemo((): FeatureCollection<Point> => {
+    return {
+      type: 'FeatureCollection',
+      features: users.map(user => ({
+        type: 'Feature',
+        geometry: {
+          type: 'Point',
+          coordinates: [
+            Number(user.location.coordinates.longitude),
+            Number(user.location.coordinates.latitude),
+          ],
+        },
+        properties: {
+          // Passamos os dados do usuário para as propriedades do ponto
+          user,
+          avatar: user.picture.thumbnail, // Usado pelo estilo 'singlePoint'
+        },
+      })),
+    };
+  }, [users]);
 
-  const centerOnUser = async () => {
-    if (Platform.OS === 'android') {
-      const granted = await PermissionsAndroid.request(
-        PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION,
-      );
-      if (granted !== PermissionsAndroid.RESULTS.GRANTED) {
-        return;
-      }
+  // Função chamada ao pressionar um ponto no mapa
+  const onPointPress = (event: any) => {
+    const feature = event.features[0];
+    if (feature.properties.cluster) {
+      // Se for um cluster, não faz nada (o mapa dá zoom por padrão)
+      return;
     }
-    navigator.geolocation.getCurrentPosition(
-      position => {
-        mapRef.current?.animateToRegion(
-          {
-            latitude: position.coords.latitude,
-            longitude: position.coords.longitude,
-            latitudeDelta: 0.05,
-            longitudeDelta: 0.05,
-          },
-          500,
-        );
-      },
-      error => console.warn(error.message),
-      {enableHighAccuracy: true, timeout: 15000, maximumAge: 10000},
-    );
+    // Se for um ponto único, pega os dados do usuário e abre o modal
+    const user = JSON.parse(feature.properties.user);
+    setModalUser(user);
   };
 
   return (
-    <View style={styles.container}>
-      <ClusteredMapView
-        ref={mapRef}
-        style={StyleSheet.absoluteFill}
-        initialRegion={INITIAL_REGION}
-        mapType={mapType}
+    <View style={styles.page}>
+      <MapboxGL.MapView
+        style={styles.map}
+        styleURL={MapboxGL.StyleURL.Street}
+        logoPosition={{ bottom: 10, left: 10 }}
       >
-        {users.map((user, i) => (
-          <ClientMarker key={i} user={user} onPress={() => setSelected(user)} />
-        ))}
-      </ClusteredMapView>
+        <MapboxGL.Camera
+          zoomLevel={4}
+          centerCoordinate={[-51.9, -14.2]}
+          animationMode="flyTo"
+          animationDuration={0}
+        />
 
-      <View style={styles.controls} pointerEvents="box-none">
-        <TouchableOpacity
-          style={styles.fab}
-          onPress={centerOnUser}
-          accessibilityLabel="Mostrar minha localização">
-          <Icon name="my-location" size={24} color="#fff" />
-        </TouchableOpacity>
-        <TouchableOpacity
-          style={styles.fab}
-          onPress={toggleMapType}
-          accessibilityLabel="Alternar tipo de mapa">
-          <Icon name={mapType === 'standard' ? 'satellite' : 'map'} size={24} color="#fff" />
-        </TouchableOpacity>
-      </View>
+        {/* A fonte de dados (nossos usuários em formato GeoJSON) */}
+        <MapboxGL.ShapeSource
+          id="clientsSource"
+          shape={geoJsonSource}
+          cluster={true} // A MÁGICA DO CLUSTER ACONTECE AQUI
+          clusterRadius={50}
+          onPress={onPointPress}
+        >
+          {/* Camada para renderizar os pontos individuais */}
+          <MapboxGL.SymbolLayer
+            id="singlePointLayer"
+            filter={['!has', 'point_count']} // Filtro para mostrar apenas pontos que NÃO são clusters
+            style={layerStyles.singlePoint}
+          />
 
-      <ClientModal user={selected} onClose={() => setSelected(null)} />
+          {/* Camada para renderizar os clusters */}
+          <MapboxGL.CircleLayer
+            id="clusterLayer"
+            filter={['has', 'point_count']} // Filtro para mostrar apenas pontos que SÃO clusters
+            style={layerStyles.cluster}
+          />
+
+          {/* Camada para renderizar a contagem dentro dos clusters */}
+          <MapboxGL.SymbolLayer
+            id="clusterCountLayer"
+            filter={['has', 'point_count']}
+            style={layerStyles.clusterCount}
+          />
+        </MapboxGL.ShapeSource>
+      </MapboxGL.MapView>
+
+      {/* O ClientModal pode ser 100% reaproveitado! */}
+      <ClientModal user={modalUser} onClose={() => setModalUser(null)} />
     </View>
   );
 };
 
 const styles = StyleSheet.create({
-  container: {flex: 1},
-  controls: {position: 'absolute', right: 16, bottom: 30},
-  fab: {
-    width: 50,
-    height: 50,
-    borderRadius: 25,
-    backgroundColor: '#0B4B3C',
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginBottom: 12,
-    elevation: 5,
-  },
+  page: { flex: 1 },
+  map: { flex: 1 },
 });
 
 export default MapScreen;

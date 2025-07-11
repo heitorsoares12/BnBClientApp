@@ -3,6 +3,7 @@ export interface User {
     first: string;
     last: string;
   };
+  email: string;
   phone: string;
   picture: {
     thumbnail: string;
@@ -13,5 +14,8 @@ export interface User {
       longitude: string;
     };
     city?: string;
+  };
+  login: {
+    uuid: string;
   };
 }

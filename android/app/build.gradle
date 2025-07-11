@@ -85,6 +85,7 @@ android {
         targetSdkVersion rootProject.ext.targetSdkVersion
         versionCode 1
         versionName "1.0"
+        buildConfigField "String", "MAPBOX_ACCESS_TOKEN", "\"pk.eyJ1IjoiaGVpdG9yc29hcmVzMTIiLCJhIjoiY21jemFnNjM3MGxodjJrb296aTkxeG9pbCJ9.opjD2W-w0pmpef-LSJFPpg\""
     }
     signingConfigs {
         debug {
@@ -111,6 +112,7 @@ android {
 dependencies {
     // The version of react-native is set by the React Native Gradle Plugin
     implementation("com.facebook.react:react-android")
+    implementation("com.google.android.gms:play-services-maps:18.2.0")
 
     if (hermesEnabled.toBoolean()) {
         implementation("com.facebook.react:hermes-android")

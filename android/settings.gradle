@@ -1,6 +1,29 @@
+dependencyResolutionManagement {
+    repositoriesMode.set(RepositoriesMode.FAIL_ON_PROJECT_REPOS)
+    repositories {
+        google()
+        mavenCentral()
+        // ADICIONE ESTE BLOCO ABAIXO
+        maven {
+            url 'https://api.mapbox.com/downloads/v2/releases/maven'
+            authentication {
+                basic(BasicAuthentication)
+            }
+            credentials {
+                // O username é sempre "mapbox"
+                username = "mapbox"
+                // A senha é o token secreto lido do gradle.properties
+                password = findProperty("MAPBOX_DOWNLOADS_TOKEN") ?: System.getenv("MAPBOX_DOWNLOADS_TOKEN")
+            }
+        }
+        // FIM DO BLOCO ADICIONADO
+    }
+}
 pluginManagement { includeBuild("../node_modules/@react-native/gradle-plugin") }
 plugins { id("com.facebook.react.settings") }
 extensions.configure(com.facebook.react.ReactSettingsExtension){ ex -> ex.autolinkLibrariesFromCommand() }
 rootProject.name = 'BnbClientApp'
 include ':app'
 includeBuild('../node_modules/@react-native/gradle-plugin')
+apply from: file("../node_modules/@react-native-community/cli-platform-android/native_modules.gradle"); applyNativeModulesSettingsGradle(settings)
+includeBuild('../node_modules/@rnmapbox/maps/android')
