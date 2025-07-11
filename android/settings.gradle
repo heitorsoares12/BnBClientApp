@@ -1,32 +1,56 @@
-pluginManagement {
-    includeBuild("../node_modules/@react-native/gradle-plugin")
-}
+rootProject.name = 'BnbClientApp'
 
-plugins { id("com.facebook.react.settings") }
+apply from: new File(rootDir, 'node_modules/react-native/react.gradle')
 
-dependencyResolutionManagement {
-    repositoriesMode.set(RepositoriesMode.FAIL_ON_PROJECT_REPOS)
-    repositories {
-        google()
-        mavenCentral()
-        // Mapbox SDK repository
-        maven {
-            url 'https://api.mapbox.com/downloads/v2/releases/maven'
-            authentication { basic(BasicAuthentication) }
-            credentials {
-                username = "mapbox"
-                password = providers.gradleProperty("MAPBOX_DOWNLOADS_TOKEN").orNull ?: System.getenv("MAPBOX_DOWNLOADS_TOKEN")
-            }
+include ':app'
+
+def reactNativeRootDir = new File(rootDir, "../node_modules/react-native")
+apply from: new File(reactNativeRootDir, "packages/react-native-codegen/scripts/generate-codegen-settings.gradle")
+
+def dotenvFile = file("${rootDir}/.env")
+if (dotenvFile.exists()) {
+    dotenvFile.eachLine { line ->
+        def (key, value) = line.split('=')
+        if (key && value) {
+            System.setProperty(key.trim(), value.trim())
         }
     }
 }
 
-extensions.configure(com.facebook.react.ReactSettingsExtension) { ex ->
-    ex.autolinkLibrariesFromCommand()
+// Mapbox Maven Repository
+buildscript {
+    repositories {
+        google()
+        mavenCentral()
+        maven {
+            url 'https://api.mapbox.com/downloads/v2/releases/maven'
+            authentication {
+                basic(BasicAuthentication)
+            }
+            credentials {
+                username = "mapbox"
+                password = "sk.eyJ1IjoiaGVpdG9yc29hcmVzMTIiLCJhIjoiY21jemI1amkzMHdyNTJ0cTYzanNuaXNpNyJ9.XgX5Fd2KM7OoYY2ndZNxEQ"
+            }
+        }
+    }
+    dependencies {
+        classpath("com.android.tools.build:gradle:7.3.1")
+    }
 }
 
-rootProject.name = 'BnbClientApp'
-include ':app'
-apply from: file("../node_modules/@react-native/gradle-plugin/native_modules.gradle")
-applyNativeModulesSettingsGradle(settings)
-includeBuild('../node_modules/@rnmapbox/maps/android')
+allprojects {
+    repositories {
+        google()
+        mavenCentral()
+        maven {
+            url 'https://api.mapbox.com/downloads/v2/releases/maven'
+            authentication {
+                basic(BasicAuthentication)
+            }
+            credentials {
+                username = "mapbox"
+                password = "sk.eyJ1IjoiaGVpdG9yc29hcmVzMTIiLCJhIjoiY21jemI1amkzMHdyNTJ0cTYzanNuaXNpNyJ9.XgX5Fd2KM7OoYY2ndZNxEQ"
+            }
+        }
+    }
+}
