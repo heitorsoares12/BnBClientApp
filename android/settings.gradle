@@ -15,7 +15,7 @@ dependencyResolutionManagement {
             authentication { basic(BasicAuthentication) }
             credentials {
                 username = "mapbox"
-                password = findProperty("MAPBOX_DOWNLOADS_TOKEN") ?: System.getenv("MAPBOX_DOWNLOADS_TOKEN")
+                password = providers.gradleProperty("MAPBOX_DOWNLOADS_TOKEN").orNull ?: System.getenv("MAPBOX_DOWNLOADS_TOKEN")
             }
         }
     }
@@ -27,5 +27,6 @@ extensions.configure(com.facebook.react.ReactSettingsExtension) { ex ->
 
 rootProject.name = 'BnbClientApp'
 include ':app'
-apply from: file("../node_modules/@react-native-community/cli-platform-android/native_modules.gradle"); applyNativeModulesSettingsGradle(settings)
+apply from: file("../node_modules/@react-native/gradle-plugin/native_modules.gradle")
+applyNativeModulesSettingsGradle(settings)
 includeBuild('../node_modules/@rnmapbox/maps/android')

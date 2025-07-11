@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from 'react';
+import React, {useCallback, useEffect, useState} from 'react';
 import {ActivityIndicator, FlatList, RefreshControl, StyleSheet, TouchableOpacity, View} from 'react-native';
 import {useUsers} from '../../contexts/UsersContext';
 import {fetchUsers} from '../../services/UserService';
@@ -20,18 +20,21 @@ const UserScreen = () => {
   const debounced = useDebounce(query, 300);
   const navigation = useNavigation<StackNavigationProp<HomeStackParamList>>();
 
-  useEffect(() => {
-    load();
-  }, []);
+  
 
-  const load = async () => {
+  const load = useCallback(async () => {
     try {
       const data = await fetchUsers();
       setUsers(data);
     } finally {
       setLoading(false);
     }
-  };
+  }, [setUsers]);
+
+
+  useEffect(() => {
+    load();
+  }, [load]);
 
   const onRefresh = async () => {
     setRefreshing(true);
