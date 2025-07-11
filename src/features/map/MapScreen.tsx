@@ -6,7 +6,7 @@ import { User } from '../../types/user';
 import ClientModal from './components/ClientModal';
 import { FeatureCollection, Point } from 'geojson';
 
-MapboxGL.setAccessToken('SUA_CHAVE_DE_ACESSO_PUBLICA_DO_MAPBOX');
+MapboxGL.setAccessToken('sk.eyJ1IjoiaGVpdG9yc29hcmVzMTIiLCJhIjoiY21jemI1amkzMHdyNTJ0cTYzanNuaXNpNyJ9.XgX5Fd2KM7OoYY2ndZNxEQ');
 
 const layerStyles = {
   // Estilo para os clusters (círculos verdes)
