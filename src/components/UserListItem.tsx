@@ -1,39 +1,59 @@
 import React from 'react';
-import {Image, StyleSheet, Text, View} from 'react-native';
+import { View, Text, Image, TouchableOpacity, StyleSheet } from 'react-native';
 import {User} from '../types/user';
 import {SPACING} from '../styles/theme';
 
-interface Props {
+interface UserListItemProps {
   user: User;
+  onPress: () => void;
 }
 
-const UserListItem = ({user}: Props) => (
-  <View style={styles.container}>
-    <Image source={{uri: user.picture.thumbnail}} style={styles.avatar} />
-    <View style={styles.info}>
-      <Text>{`${user.name.first} ${user.name.last}`}</Text>
-      <Text>{user.phone}</Text>
-    </View>
-  </View>
-);
+export default function UserListItem({ user, onPress }: UserListItemProps) {
+  return (
+    <TouchableOpacity style={styles.container} onPress={onPress}>
+      <Image
+        source={{ uri: user.picture.thumbnail }}
+        style={styles.avatar}
+      />
+      <View style={styles.infoContainer}>
+        <Text style={styles.name}>{`${user.name.first} ${user.name.last}`}</Text>
+        <Text style={styles.phone}>{user.phone}</Text>
+      </View>
+    </TouchableOpacity>
+  );
+}
 
 const styles = StyleSheet.create({
   container: {
     flexDirection: 'row',
     alignItems: 'center',
-    padding: SPACING,
-    borderBottomWidth: StyleSheet.hairlineWidth,
-    borderColor: '#ccc',
+    backgroundColor: '#FFFFFF',
+    padding: SPACING || 15,
+    borderRadius: 8,
+    marginBottom: 10,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.05,
+    shadowRadius: 3,
+    elevation: 2,
   },
   avatar: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
-    marginRight: SPACING,
+    width: 50,
+    height: 50,
+    borderRadius: 25,
+    marginRight: SPACING || 15,
   },
-  info: {
+  infoContainer: {
     flex: 1,
   },
+  name: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: '#333',
+  },
+  phone: {
+    fontSize: 14,
+    color: '#777',
+    marginTop: 4,
+  },
 });
-
-export default UserListItem;

@@ -1,99 +1,122 @@
-import React, {useEffect, useState} from 'react';
-import {ActivityIndicator, FlatList, RefreshControl, StyleSheet, Text, TouchableOpacity, View} from 'react-native';
-import {useUsers} from '../../contexts/UsersContext';
-import {fetchUsers} from '../../services/UserService';
-import UserListItem from '../../components/UserListItem';
-import SearchBar from '../../components/SearchBar';
-import useDebounce from '../../hooks/useDebounce';
-import filterUsers from '../../utils/filterUsers';
-import {COLORS, SPACING} from '../../styles/theme';
+import React from 'react';
+import {
+  View,
+  Text,
+  TouchableOpacity,
+  StyleSheet,
+  Image,
+  StatusBar,
+} from 'react-native';
+
+import { useNavigation } from '@react-navigation/native';
+import { StackNavigationProp } from '@react-navigation/stack';
+import { HomeStackParamList } from '../../navigation/AppStack';
 import Icon from 'react-native-vector-icons/MaterialIcons';
-import {useNavigation} from '@react-navigation/native';
-import {HomeStackParamList} from '../../navigation/AppStack';
-import {StackNavigationProp} from '@react-navigation/stack';
+import { SafeAreaView } from 'react-native-safe-area-context';
 
 const HomeScreen = () => {
-  const {users, setUsers} = useUsers();
-  const [loading, setLoading] = useState(true);
-  const [refreshing, setRefreshing] = useState(false);
-  const [query, setQuery] = useState('');
-  const debounced = useDebounce(query, 300);
   const navigation = useNavigation<StackNavigationProp<HomeStackParamList>>();
 
-  useEffect(() => {
-    load();
-  }, []);
-
-  const load = async () => {
-    try {
-      const data = await fetchUsers();
-      setUsers(data);
-    } finally {
-      setLoading(false);
-    }
+  const handleCadastroPress = () => {
+    navigation.navigate('NewUser');
   };
 
-  const onRefresh = async () => {
-    setRefreshing(true);
-    await load();
-    setRefreshing(false);
+  const handleCadastradosPress = () => {
+    navigation.navigate('User');
   };
-
-  const filtered = filterUsers(users, debounced);
-
-  if (loading) {
-    return (
-      <View style={styles.center}>
-        <ActivityIndicator size="large" color={COLORS.PRIMARY} />
-      </View>
-    );
-  }
 
   return (
-    <View style={styles.container}>
-      <SearchBar value={query} onChange={setQuery} />
-      {filtered.length === 0 ? (
-        <View style={styles.center}>
-          <Text>Nenhum usuário encontrado</Text>
+    <SafeAreaView style={styles.container}>
+      <StatusBar barStyle="light-content" backgroundColor="#0B4B3C" />
+
+      <View style={styles.header}>
+        <Text style={styles.greeting}>Olá, Alice</Text>
+        <View style={styles.locationContainer}>
+          <Icon name="location-on" size={18} color="#7a7a7a" />
+          <Text style={styles.locationText}>A5874125</Text>
         </View>
-      ) : (
-        <FlatList
-          data={filtered}
-          keyExtractor={(_, i) => String(i)}
-          renderItem={({item}) => <UserListItem user={item} />}
-          refreshControl={
-            <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
-          }
-        />
-      )}
-      <TouchableOpacity
-        style={styles.fab}
-        onPress={() => navigation.navigate('NewUser')}>
-        <Icon name="add" color="#fff" size={24} />
+      </View>
+
+      <Image
+        source={require('../../assets/building.png')}
+        style={styles.mainImage}
+        resizeMode="cover"
+      />
+
+      <TouchableOpacity style={styles.button} onPress={handleCadastroPress}>
+        <Icon name="person-add" size={24} color="#F7941D" />
+        <Text style={styles.buttonText}>Cadastro</Text>
       </TouchableOpacity>
-    </View>
+
+      <TouchableOpacity style={styles.button} onPress={handleCadastradosPress}>
+        <Icon name="people-alt" size={24} color="#F7941D" />
+        <Text style={styles.buttonText}>Consultar Organização</Text>
+      </TouchableOpacity>
+    </SafeAreaView>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-  },
-  center: {
-    flex: 1,
-    justifyContent: 'center',
+    backgroundColor: '#F4F4F4',
     alignItems: 'center',
+    paddingHorizontal: 16,
   },
-  fab: {
-    position: 'absolute',
-    right: SPACING,
-    bottom: SPACING,
-    backgroundColor: COLORS.PRIMARY,
-    borderRadius: 24,
-    width: 48,
-    height: 48,
-    justifyContent: 'center',
+  topBar: {
+    height: 40,
+    backgroundColor: '#0B4B3C',
+    width: '100%',
+  },
+  header: {
+    alignItems: 'flex-start',
+    width: '100%',
+    marginVertical: 16,
+  },
+  greeting: {
+    fontSize: 28,
+    fontWeight: 'bold',
+    color: '#0B4B3C',
+  },
+  locationContainer: {
+    flexDirection: 'row',
     alignItems: 'center',
+    marginTop: 4,
+  },
+  locationText: {
+    marginLeft: 4,
+    fontSize: 14,
+    color: '#7a7a7a',
+  },
+  mainImage: {
+    width: '100%',
+    height: 140,
+    borderRadius: 12,
+    marginBottom: 20,
+  },
+  button: {
+    width: '100%',
+    backgroundColor: '#fff',
+    borderRadius: 12,
+    paddingVertical: 16,
+    paddingHorizontal: 12,
+    marginVertical: 8,
+    alignItems: 'center',
+    flexDirection: 'row',
+    justifyContent: 'center',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 3 },
+    shadowOpacity: 0.1,
+    shadowRadius: 3,
+    elevation: 4,
+    borderBottomWidth: 4,
+    borderBottomColor: '#F7941D',
+  },
+  buttonText: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: '#333',
+    marginLeft: 10,
   },
 });
 
