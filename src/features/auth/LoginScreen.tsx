@@ -41,7 +41,7 @@ const LoginScreen = () => {
 
         <TextInput
           style={styles.input}
-          placeholder="Login"
+          placeholder="Usuário"
           value={username}
           onChangeText={setUsername}
           placeholderTextColor="#999"
@@ -65,7 +65,7 @@ const LoginScreen = () => {
         {error ? <Text style={styles.error}>{error}</Text> : <View style={styles.errorPlaceholder} />}
 
         <TouchableOpacity style={styles.button} onPress={handleLogin} accessibilityLabel="Botão de Entrar">
-            <Text style={styles.buttonText}>ENTRAR</Text>
+            <Text style={styles.buttonText}>Entrar</Text>
         </TouchableOpacity>
       </View>
     </KeyboardAvoidingView>
