@@ -15,8 +15,6 @@ if linkage != nil
 end
 
 target 'BnbClientApp' do
-  $RNMapboxMapsVersion = '11.0.0' # Use a versão mais recente se preferir
-  require '../node_modules/@rnmapbox/maps/scripts/post_install.rb'
   
   config = use_native_modules!
 

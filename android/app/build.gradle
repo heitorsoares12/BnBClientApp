@@ -85,8 +85,6 @@ android {
         targetSdkVersion rootProject.ext.targetSdkVersion
         versionCode 1
         versionName "1.0"
-        def mapboxAccessToken = project.findProperty("MAPBOX_ACCESS_TOKEN") ?: System.getenv("MAPBOX_ACCESS_TOKEN") ?: ""
-        buildConfigField "String", "MAPBOX_ACCESS_TOKEN", "\"${mapboxAccessToken}\""
     }
     signingConfigs {
         debug {

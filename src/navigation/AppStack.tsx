@@ -4,6 +4,8 @@ import { createStackNavigator } from '@react-navigation/stack';
 import {COLORS} from '../styles/theme';
 import HomeScreen from '../features/home/HomeScreen';
 import MapScreen from '../features/map/MapScreen';
+import UserDetailScreen from '../features/map/UserDetailScreen';
+import { User } from '../types/user';
 import NewUserScreen from '../features/cadastro/NewUserScreen';
 import UserScreen from '../features/cadastro/UserScreen';
 import Icon from 'react-native-vector-icons/MaterialIcons';
@@ -16,6 +18,11 @@ export type HomeStackParamList = {
 
 const HomeStack = createStackNavigator<HomeStackParamList>();
 const CadastroStack = createStackNavigator();
+export type MapStackParamList = {
+  Map: undefined;
+  UserDetail: { user: User };
+};
+const MapStack = createStackNavigator<MapStackParamList>();
 const Tab = createBottomTabNavigator();
 
 function HomeStackScreen() {
@@ -85,6 +92,29 @@ function CadastroStackScreen() {
   );
 }
 
+function MapStackScreen() {
+  return (
+    <MapStack.Navigator>
+      <MapStack.Screen
+        name="Map"
+        component={MapScreen}
+        options={{ headerShown: false }}
+      />
+      <MapStack.Screen
+        name="UserDetail"
+        component={UserDetailScreen}
+        options={{
+          title: 'Detalhes do Cliente',
+          headerStyle: { backgroundColor: '#0B4B3C' },
+          headerTintColor: '#fff',
+          headerTitleAlign: 'center',
+          headerTitleStyle: { fontSize: 20, fontWeight: 'bold' },
+        }}
+      />
+    </MapStack.Navigator>
+  );
+}
+
 export default function AppStack() {
   return (
     <Tab.Navigator
@@ -121,7 +151,7 @@ export default function AppStack() {
       />
       <Tab.Screen
         name="MapTab"
-        component={MapScreen}
+        component={MapStackScreen}
         options={{
           title: 'Mapa',
           tabBarIcon: ({ color, size }) => (
