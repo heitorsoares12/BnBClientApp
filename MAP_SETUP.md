@@ -1,25 +1,18 @@
-# Configurando o Mapa com OpenStreetMap
+# Configurando o Mapa com Mapbox
 
-Este projeto utiliza `react-native-maps` com tiles do OpenStreetMap e `react-native-map-clustering` para agrupamento de marcadores.
+Esta versão utiliza `@rnmapbox/maps`, que exibe mapas com dados do OpenStreetMap e não depende de chaves da Google.
 
-## 1. Remover Mapbox
-
-1. Desinstale a dependência:
-   ```bash
-   npm uninstall @rnmapbox/maps
-   ```
-2. Remova qualquer referência do Mapbox nos arquivos nativos:
-   - `android/settings.gradle` – exclua o repositório Mapbox.
-   - `android/app/build.gradle` – remova campos relacionados a `MAPBOX_ACCESS_TOKEN`.
-   - `ios/Podfile` – exclua as linhas referentes ao script do Mapbox.
-
-## 2. Instalar novas bibliotecas
+## 1. Instalação
 
 Execute:
 ```bash
-npm install react-native-maps react-native-map-clustering
+npm install @rnmapbox/maps
 ```
-Essas bibliotecas funcionam em ambas as plataformas sem necessidade de chaves de API.
+Depois rode `npx pod-install` dentro da pasta `ios` para atualizar os pods.
+
+## 2. Remover implementações anteriores (opcional)
+
+Se houver referências ao `react-native-maps` ou ao `react-native-map-clustering`, remova-as do `package.json` e das importações do projeto.
 
 ## 3. Ajuste no AndroidManifest
 

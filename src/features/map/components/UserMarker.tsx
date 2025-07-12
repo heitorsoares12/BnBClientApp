@@ -1,6 +1,6 @@
 import React from 'react';
 import { Image, View, StyleSheet } from 'react-native';
-import { Marker } from 'react-native-maps';
+import MapboxGL from '@rnmapbox/maps';
 import { User } from '../../../types/user';
 
 interface Props {
@@ -9,17 +9,21 @@ interface Props {
 }
 
 export default function UserMarker({ user, onPress }: Props) {
-  const coordinate = {
-    latitude: Number(user.location.coordinates.latitude),
-    longitude: Number(user.location.coordinates.longitude),
-  };
+  const coordinate: [number, number] = [
+    Number(user.location.coordinates.longitude),
+    Number(user.location.coordinates.latitude),
+  ];
 
   return (
-    <Marker coordinate={coordinate} onPress={onPress} tracksViewChanges={false}>
+    <MapboxGL.PointAnnotation
+      id={user.login.uuid}
+      coordinate={coordinate}
+      onSelected={onPress}
+    >
       <View style={styles.avatarContainer}>
         <Image source={{ uri: user.picture.thumbnail }} style={styles.avatar} />
       </View>
-    </Marker>
+    </MapboxGL.PointAnnotation>
   );
 }
 

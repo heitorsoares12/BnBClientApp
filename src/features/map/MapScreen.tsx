@@ -1,7 +1,7 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { StyleSheet, View } from 'react-native';
-import MapView from 'react-native-map-clustering';
-import { UrlTile } from 'react-native-maps';
+import MapboxGL from '@rnmapbox/maps';
+import Geolocation from 'react-native-geolocation-service';
 import { useUsers } from '../../contexts/UsersContext';
 import { User } from '../../types/user';
 import UserMarker from './components/UserMarker';
@@ -9,16 +9,27 @@ import { useNavigation } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { MapStackParamList } from '../../navigation/AppStack';
 
-const INITIAL_REGION = {
-  latitude: -14.2,
-  longitude: -51.9,
-  latitudeDelta: 30,
-  longitudeDelta: 30,
-};
+// Substitua pela sua chave de acesso do Mapbox
+MapboxGL.setAccessToken('YOUR_MAPBOX_TOKEN');
+
+const INITIAL_COORDINATE: [number, number] = [-51.9, -14.2];
 
 const MapScreen = () => {
   const { users } = useUsers();
   const navigation = useNavigation<StackNavigationProp<MapStackParamList>>();
+  const [center, setCenter] = useState<[number, number]>(INITIAL_COORDINATE);
+
+  useEffect(() => {
+    Geolocation.getCurrentPosition(
+      position => {
+        setCenter([position.coords.longitude, position.coords.latitude]);
+      },
+      error => {
+        console.warn(error);
+      },
+      { enableHighAccuracy: true, timeout: 15000, maximumAge: 10000 }
+    );
+  }, []);
 
   const handleMarkerPress = (user: User) => {
     navigation.navigate('UserDetail', { user });
@@ -26,12 +37,13 @@ const MapScreen = () => {
 
   return (
     <View style={styles.page}>
-      <MapView style={styles.map} initialRegion={INITIAL_REGION} animationEnabled={false}>
-        <UrlTile urlTemplate="https://tile.openstreetmap.org/{z}/{x}/{y}.png" maximumZ={19} />
+      <MapboxGL.MapView style={styles.map}>
+        <MapboxGL.Camera zoomLevel={5} centerCoordinate={center} />
+        <MapboxGL.UserLocation visible />
         {users.map(u => (
           <UserMarker key={u.login.uuid} user={u} onPress={() => handleMarkerPress(u)} />
         ))}
-      </MapView>
+      </MapboxGL.MapView>
     </View>
   );
 };
