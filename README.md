@@ -1,97 +1,102 @@
-This is a new [**React Native**](https://reactnative.dev) project, bootstrapped using [`@react-native-community/cli`](https://github.com/react-native-community/cli).
+# BnbClientApp
 
-# Getting Started
+## Descrição do Projeto
+Este projeto é um aplicativo móvel desenvolvido em React Native, projetado para gerenciar e visualizar informações de clientes. Ele permite o cadastro de novos usuários e a visualização de todos os clientes em uma lista e em um mapa interativo. A aplicação foi desenvolvida como parte de um teste técnico, focando em boas práticas de desenvolvimento, organização de código e experiência do usuário.
 
-> **Note**: Make sure you have completed the [Set Up Your Environment](https://reactnative.dev/docs/set-up-your-environment) guide before proceeding.
+## Tecnologias Utilizadas
+- **React Native**: Framework para construção de aplicativos móveis nativos usando JavaScript/TypeScript.
+- **TypeScript**: Superset do JavaScript que adiciona tipagem estática.
+- **React Navigation**: Solução de navegação para aplicativos React Native.
+- **React Hook Form**: Biblioteca para gerenciamento de formulários com validação.
+- **Yup**: Construtor de esquemas para validação de dados.
+- **React Native Maps**: Componente de mapa para React Native, integrando Google Maps.
+- **React Native Map Clustering**: Biblioteca para agrupar marcadores no mapa, melhorando a performance e a visualização.
+- **@react-native-community/geolocation**: API para obter a localização do dispositivo.
+- **Axios**: Cliente HTTP para fazer requisições a APIs.
+- **Styled Components**: Biblioteca para estilização de componentes React com CSS-in-JS.
+- **UUID**: Para geração de identificadores únicos.
 
-## Step 1: Start Metro
+## Instalação e Execução
 
-First, you will need to run **Metro**, the JavaScript build tool for React Native.
+### Pré-requisitos
+- Node.js (20.19.3)
+- npm ou Yarn
+- React Native CLI
+- Android Studio (para desenvolvimento Android) ou Xcode (para desenvolvimento iOS)
 
-To start the Metro dev server, run the following command from the root of your React Native project:
+### Passos para Instalação
+1.  **Clone o repositório:**
+    ```bash
+    git clone <https://github.com/heitorsoares12/BnBClientApp.git>
+    cd BnbClientApp
+    ```
+2.  **Instale as dependências:**
+    ```bash
+    npm install
+    # ou yarn install
+    ```
+3.  **Configuração para iOS (se aplicável):**
+    ```bash
+    cd ios
+    pod install
+    cd ..
+    ```
 
-```sh
-# Using npm
-npm start
+### Execução do Aplicativo
 
-# OR using Yarn
-yarn start
-```
+#### Android
+1.  **Inicie o Metro Bundler:**
+    ```bash
+    npm start
+    # ou yarn start
+    ```
+2.  **Em outro terminal, execute o aplicativo no emulador/dispositivo:**
+    ```bash
+    npx react-native run-android
+    ```
 
-## Step 2: Build and run your app
+#### iOS
+1.  **Inicie o Metro Bundler:**
+    ```bash
+    npm start
+    # ou yarn start
+    ```
+2.  **Em outro terminal, execute o aplicativo no simulador/dispositivo:**
+    ```bash
+    npx react-native run-ios
+    ```
+    Ou abra o projeto no Xcode (`ios/BnbClientApp.xcworkspace`) e execute por lá.
 
-With Metro running, open a new terminal window/pane from the root of your React Native project, and use one of the following commands to build and run your Android or iOS app:
+## Funcionalidades
+-   **Autenticação (Simulada):** Gerenciamento de estado de autenticação.
+-   **Cadastro de Clientes:** Formulário para adicionar novos clientes com validação de dados (nome, telefone, e-mail).
+-   **Listagem de Clientes:** Exibição de todos os clientes cadastrados em uma lista, com funcionalidade de busca.
+-   **Mapa Interativo:** Visualização dos clientes em um mapa, utilizando:
+    -   **Clustering:** Agrupamento de marcadores para melhor visualização em áreas com muitos clientes.
+    -   **Detalhes do Cliente:** Ao tocar em um marcador, um card com informações detalhadas do cliente é exibido.
+    -   **Localização Atual:** O mapa pode centralizar na localização atual do usuário (requer permissão).
 
-### Android
+## Estrutura de Pastas
+O projeto segue uma estrutura modular e organizada para facilitar a manutenção e escalabilidade:
 
-```sh
-# Using npm
-npm run android
+-   `src/assets`: Contém arquivos de mídia como imagens.
+-   `src/components`: Componentes React Native reutilizáveis e genéricos (ex: `SearchBar`, `UserListItem`).
+-   `src/contexts`: Contextos da aplicação para gerenciamento de estado global (ex: `AuthContext`, `UsersContext`).
+-   `src/features`: Módulos de funcionalidades específicas, cada um contendo suas telas, componentes e lógica relacionados (ex: `auth`, `cadastro`, `home`, `map`).
+-   `src/hooks`: Hooks personalizados para lógica reutilizável (ex: `useDebounce`).
+-   `src/navigation`: Configuração da navegação da aplicação (Stack Navigators, Tab Navigators).
+-   `src/services`: Módulos para interação com APIs e serviços externos (ex: `api.ts`, `UserService.ts`).
+-   `src/styles`: Definições de estilos globais e temas (ex: `theme.ts`).
+-   `src/tests`: Arquivos de testes unitários e de integração.
+-   `src/types`: Definições de tipos TypeScript para a aplicação.
+-   `src/utils`: Funções utilitárias diversas (ex: `filterUsers`).
 
-# OR using Yarn
-yarn android
-```
-
-### iOS
-
-For iOS, remember to install CocoaPods dependencies (this only needs to be run on first clone or after updating native deps).
-
-The first time you create a new project, run the Ruby bundler to install CocoaPods itself:
-
-```sh
-bundle install
-```
-
-Then, and every time you update your native dependencies, run:
-
-```sh
-bundle exec pod install
-```
-
-For more information, please visit [CocoaPods Getting Started guide](https://guides.cocoapods.org/using/getting-started.html).
-
-```sh
-# Using npm
-npm run ios
-
-# OR using Yarn
-yarn ios
-```
-
-If everything is set up correctly, you should see your new app running in the Android Emulator, iOS Simulator, or your connected device.
-
-This is one way to run your app — you can also build it directly from Android Studio or Xcode.
-
-## Step 3: Modify your app
-
-Now that you have successfully run the app, let's make changes!
-
-Open `App.tsx` in your text editor of choice and make some changes. When you save, your app will automatically update and reflect these changes — this is powered by [Fast Refresh](https://reactnative.dev/docs/fast-refresh).
-
-When you want to forcefully reload, for example to reset the state of your app, you can perform a full reload:
-
-- **Android**: Press the <kbd>R</kbd> key twice or select **"Reload"** from the **Dev Menu**, accessed via <kbd>Ctrl</kbd> + <kbd>M</kbd> (Windows/Linux) or <kbd>Cmd ⌘</kbd> + <kbd>M</kbd> (macOS).
-- **iOS**: Press <kbd>R</kbd> in iOS Simulator.
-
-## Congratulations! :tada:
-
-You've successfully run and modified your React Native App. :partying_face:
-
-### Now what?
-
-- If you want to add this new React Native code to an existing application, check out the [Integration guide](https://reactnative.dev/docs/integration-with-existing-apps).
-- If you're curious to learn more about React Native, check out the [docs](https://reactnative.dev/docs/getting-started).
-
-# Troubleshooting
-
-If you're having issues getting the above steps to work, see the [Troubleshooting](https://reactnative.dev/docs/troubleshooting) page.
-
-# Learn More
-
-To learn more about React Native, take a look at the following resources:
-
-- [React Native Website](https://reactnative.dev) - learn more about React Native.
-- [Getting Started](https://reactnative.dev/docs/environment-setup) - an **overview** of React Native and how setup your environment.
-- [Learn the Basics](https://reactnative.dev/docs/getting-started) - a **guided tour** of the React Native **basics**.
-- [Blog](https://reactnative.dev/blog) - read the latest official React Native **Blog** posts.
-- [`@facebook/react-native`](https://github.com/facebook/react-native) - the Open Source; GitHub **repository** for React Native.
+## Possíveis Melhorias Futuras
+-   **Persistência de Dados:** Implementar armazenamento local (AsyncStorage, Realm, SQLite) para persistir os dados dos clientes cadastrados, mesmo após o fechamento do aplicativo.
+-   **Edição de Clientes:** Adicionar funcionalidade para editar as informações de um cliente existente.
+-   **Exclusão de Clientes:** Implementar a opção de remover clientes da lista.
+-   **Otimização de Performance do Mapa:** Para um número muito grande de marcadores, explorar otimizações adicionais no `react-native-maps` e `react-native-map-clustering`.
+-   **Testes Abrangentes:** Expandir a cobertura de testes unitários e adicionar testes de integração e E2E (End-to-End).
+-   **Internacionalização:** Suporte a múltiplos idiomas.
+-   **Notificações:** Implementar notificações locais ou push para eventos relevantes.
+-   **Animações:** Adicionar animações mais fluidas e personalizadas para uma melhor experiência do usuário.

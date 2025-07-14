@@ -8,6 +8,9 @@ require Pod::Executable.execute_command('node', ['-p',
 platform :ios, min_ios_version_supported
 prepare_react_native_project!
 
+# Add this line
+$RNMapsMapsPath = '../node_modules/react-native-maps'
+
 linkage = ENV['USE_FRAMEWORKS']
 if linkage != nil
   Pod::UI.puts "Configuring Pod with #{linkage}ally linked Frameworks".green
@@ -23,6 +26,9 @@ target 'BnbClientApp' do
     :app_path => "#{Pod::Config.instance.installation_root}/.."
   )
 
+  # Add this line
+  pod 'GoogleMaps'
+
   post_install do |installer|
     # https://github.com/facebook/react-native/blob/main/packages/react-native/scripts/react_native_pods.rb#L197-L202
     react_native_post_install(
@@ -31,5 +37,10 @@ target 'BnbClientApp' do
       :mac_catalyst_enabled => false,
       # :ccache_enabled => true
     )
+    # Add this line
+    Dir.chdir($RNMapsMapsPath) do
+      # Add this line
+      Pod::command('install', '--repo-update').run
+    end
   end
 end

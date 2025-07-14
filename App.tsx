@@ -1,28 +1,59 @@
-/**
- * Sample React Native App
- * https://github.com/facebook/react-native
- *
- * @format
- */
+import 'react-native-gesture-handler';
+import React from 'react';
+import { NavigationContainer, DefaultTheme, DarkTheme } from '@react-navigation/native';
+import { useColorScheme } from 'react-native';
+import { AuthProvider, useAuth } from './src/contexts/AuthContext';
+import { UsersProvider } from './src/contexts/UsersContext';
+import AuthStackNavigator from './src/navigation/AuthStack';
+import AppStackNavigator from './src/navigation/AppStack';
+import { getColors } from './src/styles/theme';
 
-import { NewAppScreen } from '@react-native/new-app-screen';
-import { StatusBar, StyleSheet, useColorScheme, View } from 'react-native';
+const AppContent = () => {
+  const { isLoggedIn } = useAuth();
+  const scheme = useColorScheme();
+  const colors = getColors(scheme);
 
-function App() {
-  const isDarkMode = useColorScheme() === 'dark';
+  const MyTheme = {
+    ...DefaultTheme,
+    colors: {
+      ...DefaultTheme.colors,
+      primary: colors.primary,
+      background: colors.background,
+      card: colors.card,
+      text: colors.text,
+      border: colors.border,
+      notification: colors.notification,
+    },
+  };
+
+  const MyDarkTheme = {
+    ...DarkTheme,
+    colors: {
+      ...DarkTheme.colors,
+      primary: colors.primary,
+      background: colors.background,
+      card: colors.card,
+      text: colors.text,
+      border: colors.border,
+      notification: colors.notification,
+    },
+  };
 
   return (
-    <View style={styles.container}>
-      <StatusBar barStyle={isDarkMode ? 'light-content' : 'dark-content'} />
-      <NewAppScreen templateFileName="App.tsx" />
-    </View>
+    <NavigationContainer theme={scheme === 'dark' ? MyDarkTheme : MyTheme}>
+      {isLoggedIn ? <AppStackNavigator /> : <AuthStackNavigator />}
+    </NavigationContainer>
   );
-}
+};
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-  },
-});
+const App = () => {
+  return (
+    <AuthProvider>
+      <UsersProvider>
+        <AppContent />
+      </UsersProvider>
+    </AuthProvider>
+  );
+};
 
 export default App;
