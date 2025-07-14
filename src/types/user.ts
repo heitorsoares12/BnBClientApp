@@ -4,7 +4,7 @@ export interface User {
     last: string;
   };
   phone: string;
-  email: string; // Adicionado
+  email: string;
   picture: {
     large: string;
     thumbnail: string;
@@ -17,6 +17,6 @@ export interface User {
     city?: string;
   };
   login: {
-    uuid: string; // Adicionado para identificador único
+    uuid: string;
   };
 }

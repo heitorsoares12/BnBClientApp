@@ -3,7 +3,7 @@ import { render, fireEvent, waitFor } from '@testing-library/react-native';
 import LoginScreen from '../features/auth/LoginScreen';
 import { AuthProvider } from '../contexts/AuthContext';
 
-// Mock useAuth hook to control its behavior in tests
+
 jest.mock('../../contexts/AuthContext', () => ({
   useAuth: () => ({
     signIn: jest.fn((username, password) => {
@@ -16,7 +16,7 @@ jest.mock('../../contexts/AuthContext', () => ({
     user: null,
     signOut: jest.fn(),
   }),
-  AuthProvider: ({ children }: any) => <>{children}</>, // Simple passthrough for AuthProvider
+  AuthProvider: ({ children }: any) => <>{children}>,
 }));
 
 describe('LoginScreen', () => {
@@ -49,7 +49,7 @@ describe('LoginScreen', () => {
   });
 
   it('navigates on successful login', async () => {
-    // Mock navigation if needed, but for this test, we just check if signIn returns true
+    
     const { getByPlaceholderText, getByText } = render(
       <AuthProvider>
         <LoginScreen />
@@ -61,10 +61,10 @@ describe('LoginScreen', () => {
     fireEvent.press(getByText('Entrar'));
 
     // Since navigation is handled by App.tsx based on AuthContext, we don't assert navigation directly here.
-    // We assume the mocked signIn returning true is sufficient for this unit test.
-    // Integration tests would cover the actual navigation flow.
+    
+    
     await waitFor(() => {
-      // Assert that no error message is displayed
+      
       expect(() => getByText('Credenciais inválidas.')).toThrow();
     });
   });

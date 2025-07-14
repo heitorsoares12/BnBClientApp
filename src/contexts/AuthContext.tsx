@@ -18,7 +18,7 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
   const [user, setUser] = useState<{ username: string } | null>(null);
 
   const signIn = async (username: string, password: string): Promise<boolean> => {
-    // Simulated authentication logic
+    
     if (username === 'user' && password === '123') {
       setIsLoggedIn(true);
       setUser({ username });

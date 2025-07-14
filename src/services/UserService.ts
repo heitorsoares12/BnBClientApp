@@ -13,7 +13,7 @@ export async function fetchUsers(count: number = 10): Promise<User[]> {
           latitude: (Math.random() * ((-19.0) - (-25.0)) + (-25.0)).toFixed(6),
           longitude: (Math.random() * ((-44.0) - (-53.0)) + (-53.0)).toFixed(6),
         },
-        city: 'São Paulo', // Mockando a cidade para São Paulo
+        city: 'São Paulo',
       },
       email: item.email,
       login: { uuid: item.login.uuid },

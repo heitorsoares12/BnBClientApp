@@ -4,19 +4,19 @@ import NewUserScreen from '../features/cadastro/NewUserScreen';
 import { useUsers } from '../contexts/UsersContext';
 import { Alert } from 'react-native';
 
-// Mock the useUsers hook
+
 jest.mock('../contexts/UsersContext', () => ({
   useUsers: () => ({
     addUser: jest.fn(),
   }),
 }));
 
-// Mock navigation
+
 const mockNavigation = {
   goBack: jest.fn(),
 };
 
-// Mock Alert
+
 jest.mock('react-native', () => ({
   ...jest.requireActual('react-native'),
   Alert: {

@@ -67,7 +67,7 @@ const BottomTabNavigator = () => {
             iconName = focused ? 'map' : 'map-outline';
           }
 
-          // You can return any component that you like here!
+          
           return <Icon name={iconName as string} size={size} color={color} />;
         },
         tabBarActiveTintColor: colors.secondary,

@@ -29,14 +29,14 @@ describe('AuthContext', () => {
   it('should sign out correctly', async () => {
     const { result } = renderHook(() => useAuth(), { wrapper: AuthProvider });
 
-    // First, sign in
+    
     await act(async () => {
       await result.current.signIn('user', '123');
     });
 
     expect(result.current.isLoggedIn).toBe(true);
 
-    // Then, sign out
+    
     act(() => {
       result.current.signOut();
     });

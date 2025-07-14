@@ -5,7 +5,7 @@ import { User } from '../../../types/user';
 interface Props {
   user: User;
   selected: boolean;
-  onPress?: () => void; // Adicionado onPress
+  onPress?: () => void;
 }
 
 const UserMarker = ({ user, selected, onPress }: Props) => (

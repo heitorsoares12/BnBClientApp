@@ -5,15 +5,15 @@ import { useUsers } from '../contexts/UsersContext';
 import useDebounce from '../hooks/useDebounce';
 import { filterUsers } from '../utils/filterUsers';
 
-// Mock the useUsers hook
+
 jest.mock('../contexts/UsersContext', () => ({
   useUsers: jest.fn(),
 }));
 
-// Mock the useDebounce hook
+
 jest.mock('../hooks/useDebounce', () => jest.fn());
 
-// Mock the filterUsers utility
+
 jest.mock('../utils/filterUsers', () => ({
   filterUsers: jest.fn(),
 }));
@@ -45,12 +45,12 @@ const mockUsers = [
 
 describe('HomeScreen', () => {
   beforeEach(() => {
-    // Reset mocks before each test
+    
     (useUsers as jest.Mock).mockReset();
     (useDebounce as jest.Mock).mockReset();
     (filterUsers as jest.Mock).mockReset();
 
-    // Default mock implementations
+    
     (useUsers as jest.Mock).mockReturnValue({
       users: mockUsers,
       loading: false,
@@ -102,7 +102,7 @@ describe('HomeScreen', () => {
       error: null,
       fetchUsers: mockFetchUsers,
     });
-    (useDebounce as jest.Mock).mockImplementation((value) => value); // Ensure debounce passes value immediately
+    (useDebounce as jest.Mock).mockImplementation((value) => value);
     (filterUsers as jest.Mock).mockImplementation((users, searchTerm) => {
       if (searchTerm === 'john') return [mockUsers[0]];
       return users;
@@ -127,7 +127,7 @@ describe('HomeScreen', () => {
       fetchUsers: jest.fn(),
     });
     (useDebounce as jest.Mock).mockImplementation((value) => value);
-    (filterUsers as jest.Mock).mockImplementation(() => []); // Simulate no results
+    (filterUsers as jest.Mock).mockImplementation(() => []);
 
     const { getByPlaceholderText, getByText } = render(<HomeScreen />);
 
@@ -149,11 +149,11 @@ describe('HomeScreen', () => {
 
     const { getByTestId } = render(<HomeScreen />);
 
-    // Simulate pull-to-refresh
+    
     fireEvent(getByTestId('FlatList'), 'onRefresh');
 
     await waitFor(() => {
-      expect(mockFetchUsers).toHaveBeenCalledTimes(2); // Once on mount, once on refresh
+      expect(mockFetchUsers).toHaveBeenCalledTimes(2);
     });
   });
 });
