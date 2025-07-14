@@ -4,7 +4,9 @@ export interface User {
     last: string;
   };
   phone: string;
+  email: string; // Adicionado
   picture: {
+    large: string;
     thumbnail: string;
   };
   location: {
@@ -13,5 +15,8 @@ export interface User {
       longitude: string;
     };
     city?: string;
+  };
+  login: {
+    uuid: string; // Adicionado para identificador único
   };
 }

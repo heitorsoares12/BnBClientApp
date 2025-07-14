@@ -1,6 +1,5 @@
 import React from 'react';
 import {StyleSheet, TextInput, View} from 'react-native';
-import { SPACING} from '../styles/theme';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 
 interface SearchBarProps {
@@ -29,8 +28,8 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     backgroundColor: '#FFFFFF',
     borderRadius: 8,
-    paddingHorizontal: SPACING || 15,
-    margin: SPACING || 20,
+    paddingHorizontal: 15,
+    margin: 20,
     height: 50,
     shadowColor: "#000",
     shadowOffset: { width: 0, height: 1 },

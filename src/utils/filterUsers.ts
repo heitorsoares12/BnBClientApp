@@ -1,11 +1,16 @@
-import {User} from '../types/user';
+import { User } from '../types/user';
 
-export default function filterUsers(users: User[], query: string): User[] {
-  if (!query) return users;
-  const lower = query.toLowerCase();
+export const filterUsers = (users: User[], searchTerm: string): User[] => {
+  if (!searchTerm) {
+    return users;
+  }
+
+  const lowerCaseSearchTerm = searchTerm.toLowerCase();
+
   return users.filter(user => {
-    const name = `${user.name.first} ${user.name.last}`.toLowerCase();
-    const phone = user.phone.toLowerCase();
-    return name.includes(lower) || phone.includes(lower);
+    const fullName = `${user.name.first} ${user.name.last}`.toLowerCase();
+    const phoneNumber = user.phone.toLowerCase();
+
+    return fullName.includes(lowerCaseSearchTerm) || phoneNumber.includes(lowerCaseSearchTerm);
   });
-}
+};

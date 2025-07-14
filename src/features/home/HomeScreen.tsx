@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useCallback } from 'react';
 import {
   View,
   Text,
@@ -17,13 +17,13 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 const HomeScreen = () => {
   const navigation = useNavigation<StackNavigationProp<HomeStackParamList>>();
 
-  const handleCadastroPress = () => {
-    navigation.navigate('NewUser');
-  };
+  const handleCadastroPress = useCallback(() => {
+    navigation.navigate('NewUserScreen');
+  }, [navigation]);
 
-  const handleCadastradosPress = () => {
-    navigation.navigate('User');
-  };
+  const handleCadastradosPress = useCallback(() => {
+    navigation.navigate('UserScreen');
+  }, [navigation]);
 
   return (
     <SafeAreaView style={styles.container}>

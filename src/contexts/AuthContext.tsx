@@ -1,60 +1,50 @@
-import React, {createContext, useContext, useReducer, ReactNode} from 'react';
+import React, { createContext, useState, useContext, ReactNode } from 'react';
 
-type UserInfo = {
-  username: string;
-};
-
-type AuthState = {
-  isAuthenticated: boolean;
-  user: UserInfo | null;
-};
-
-export const initialAuthState: AuthState = {isAuthenticated: false, user: null};
-
-type Action =
-  | {type: 'SIGN_IN'; payload: UserInfo}
-  | {type: 'SIGN_OUT'};
-
-export function authReducer(state: AuthState, action: Action): AuthState {
-  switch (action.type) {
-    case 'SIGN_IN':
-      return {isAuthenticated: true, user: action.payload};
-    case 'SIGN_OUT':
-      return {isAuthenticated: false, user: null};
-    default:
-      return state;
-  }
-}
-
-interface AuthActions {
-  signIn: (username: string, password: string) => void;
+interface AuthContextType {
+  isLoggedIn: boolean;
+  user: { username: string } | null;
+  signIn: (username: string, password: string) => Promise<boolean>;
   signOut: () => void;
 }
 
-const AuthContext = createContext<AuthState & AuthActions>({
-  ...initialAuthState,
-  signIn: () => {},
-  signOut: () => {},
-});
+const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
-export const AuthProvider = ({children}: {children: ReactNode}) => {
-  const [state, dispatch] = useReducer(authReducer, initialAuthState);
+interface AuthProviderProps {
+  children: ReactNode;
+}
 
-  const signIn = (username: string, password: string) => {
+export const AuthProvider = ({ children }: AuthProviderProps) => {
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [user, setUser] = useState<{ username: string } | null>(null);
+
+  const signIn = async (username: string, password: string): Promise<boolean> => {
+    // Simulated authentication logic
     if (username === 'user' && password === '123') {
-      dispatch({type: 'SIGN_IN', payload: {username}});
+      setIsLoggedIn(true);
+      setUser({ username });
+      return true;
     }
+    setIsLoggedIn(false);
+    setUser(null);
+    return false;
   };
 
-  const signOut = () => dispatch({type: 'SIGN_OUT'});
+  const signOut = () => {
+    setIsLoggedIn(false);
+    setUser(null);
+  };
 
   return (
-    <AuthContext.Provider value={{...state, signIn, signOut}}>
+    <AuthContext.Provider value={{ isLoggedIn, user, signIn, signOut }}>
       {children}
     </AuthContext.Provider>
   );
 };
 
-export const useAuth = () => useContext(AuthContext);
-
-export default AuthContext;
+export const useAuth = () => {
+  const context = useContext(AuthContext);
+  if (context === undefined) {
+    throw new Error('useAuth must be used within an AuthProvider');
+  }
+  return context;
+};

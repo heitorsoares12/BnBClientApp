@@ -1,29 +1,56 @@
-import React, {createContext, ReactNode, useContext, useState} from 'react';
-import {User} from '../types/user';
+import React, { createContext, useState, useContext, ReactNode, useCallback } from 'react';
+import { User } from '../types/user';
+import { fetchUsers as UserServiceFetchUsers } from '../services/UserService';
 
-interface UsersContextValue {
+interface UsersContextType {
   users: User[];
+  loading: boolean;
+  error: string | null;
+  fetchUsers: () => Promise<void>;
+  addUser: (newUser: User) => void;
   setUsers: (users: User[]) => void;
-  addUser: (user: User) => void;
 }
 
-const UsersContext = createContext<UsersContextValue>({
-  users: [],
-  setUsers: () => {},
-  addUser: () => {},
-});
+const UsersContext = createContext<UsersContextType | undefined>(undefined);
 
-export const UsersProvider = ({children}: {children: ReactNode}) => {
-  const [users, setUsersState] = useState<User[]>([]);
+interface UsersProviderProps {
+  children: ReactNode;
+}
 
-  const setUsers = (newUsers: User[]) => setUsersState(newUsers);
-  const addUser = (user: User) => setUsersState(prev => [user, ...prev]);
+export const UsersProvider = ({ children }: UsersProviderProps) => {
+  const [users, setUsers] = useState<User[]>([]);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  const fetchUsers = useCallback(async () => {
+    setLoading(true);
+    setError(null);
+    try {
+      const fetchedUsers = await UserServiceFetchUsers(10);
+      setUsers(fetchedUsers);
+    } catch (err) {
+      setError('Erro ao carregar usuários.');
+      console.error('Error fetching users in context:', err);
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  const addUser = (newUser: User) => {
+    setUsers((prevUsers) => [newUser, ...prevUsers]);
+  };
 
   return (
-    <UsersContext.Provider value={{users, setUsers, addUser}}>
+    <UsersContext.Provider value={{ users, loading, error, fetchUsers, addUser, setUsers }}>
       {children}
     </UsersContext.Provider>
   );
 };
 
-export const useUsers = () => useContext(UsersContext);
+export const useUsers = () => {
+  const context = useContext(UsersContext);
+  if (context === undefined) {
+    throw new Error('useUsers must be used within a UsersProvider');
+  }
+  return context;
+};

@@ -1,19 +1,47 @@
-import {authReducer, initialAuthState} from '../contexts/AuthContext';
+import { renderHook, act } from '@testing-library/react-hooks';
+import { AuthProvider, useAuth } from '../contexts/AuthContext';
 
-describe('authReducer', () => {
-  it('handles SIGN_IN', () => {
-    const state = authReducer(initialAuthState, {
-      type: 'SIGN_IN',
-      payload: {username: 'user'},
+describe('AuthContext', () => {
+  it('should sign in with correct credentials', async () => {
+    const { result } = renderHook(() => useAuth(), { wrapper: AuthProvider });
+
+    await act(async () => {
+      const success = await result.current.signIn('user', '123');
+      expect(success).toBe(true);
     });
-    expect(state.isAuthenticated).toBe(true);
-    expect(state.user).toEqual({username: 'user'});
+
+    expect(result.current.isLoggedIn).toBe(true);
+    expect(result.current.user).toEqual({ username: 'user' });
   });
 
-  it('handles SIGN_OUT', () => {
-    const signedIn = {isAuthenticated: true, user: {username: 'user'}};
-    const state = authReducer(signedIn, {type: 'SIGN_OUT'});
-    expect(state.isAuthenticated).toBe(false);
-    expect(state.user).toBeNull();
+  it('should not sign in with incorrect credentials', async () => {
+    const { result } = renderHook(() => useAuth(), { wrapper: AuthProvider });
+
+    await act(async () => {
+      const success = await result.current.signIn('wronguser', 'wrongpass');
+      expect(success).toBe(false);
+    });
+
+    expect(result.current.isLoggedIn).toBe(false);
+    expect(result.current.user).toBeNull();
+  });
+
+  it('should sign out correctly', async () => {
+    const { result } = renderHook(() => useAuth(), { wrapper: AuthProvider });
+
+    // First, sign in
+    await act(async () => {
+      await result.current.signIn('user', '123');
+    });
+
+    expect(result.current.isLoggedIn).toBe(true);
+
+    // Then, sign out
+    act(() => {
+      result.current.signOut();
+    });
+
+    expect(result.current.isLoggedIn).toBe(false);
+    expect(result.current.user).toBeNull();
   });
 });

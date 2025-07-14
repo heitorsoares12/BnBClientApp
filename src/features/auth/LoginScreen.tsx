@@ -1,148 +1,149 @@
-import React, {useState} from 'react';
-import {
-  KeyboardAvoidingView,
-  Platform,
-  StyleSheet,
-  Text,
-  TextInput,
-  TouchableOpacity,
-  View,
-} from 'react-native';
-import {useAuth} from '../../contexts/AuthContext';
-import {COLORS, SPACING} from '../../styles/theme';
+
+import React, { useState } from 'react';
+import { View, Text, TextInput, StyleSheet, useColorScheme, KeyboardAvoidingView, Platform, TouchableOpacity } from 'react-native';
+import { useAuth } from '../../contexts/AuthContext';
+import { useForm, Controller } from 'react-hook-form';
+import * as yup from 'yup';
+import { yupResolver } from '@hookform/resolvers/yup';
+import { getColors } from '../../styles/theme';
+
+const loginSchema = yup.object().shape({
+  username: yup.string().required('Usuário é obrigatório'),
+  password: yup.string().required('Senha é obrigatória'),
+});
+
+type FormData = yup.InferType<typeof loginSchema>;
 
 const LoginScreen = () => {
-  const {signIn} = useAuth();
-  const [username, setUsername] = useState('');
-  const [password, setPassword] = useState('');
-  const [error, setError] = useState('');
+  const { signIn } = useAuth();
+  const [error, setError] = useState<string | null>(null);
+  const scheme = useColorScheme();
+  const colors = getColors(scheme);
 
-  const handleLogin = () => {
-    if (!username || !password) {
-      setError('Preencha usuário e senha');
-      return;
-    }
-    if (username === 'user' && password === '123') {
-      setError('');
-      signIn(username, password);
-    } else {
-      setError('Credenciais incorretas');
+  const { control, handleSubmit, formState: { errors } } = useForm<FormData>({
+    resolver: yupResolver(loginSchema),
+  });
+
+  const handleLogin = async (data: FormData) => {
+    setError(null);
+    const success = await signIn(data.username, data.password);
+    if (!success) {
+      setError('Credenciais inválidas.');
     }
   };
 
+  const styles = StyleSheet.create({
+    container: {
+      flex: 1,
+      justifyContent: 'center',
+      alignItems: 'center',
+      backgroundColor: '#f0f2f5',
+      padding: 20,
+    },
+    card: {
+      backgroundColor: '#FFFFFF',
+      borderRadius: 16,
+      padding: 24,
+      width: '100%',
+      shadowColor: '#000',
+      shadowOffset: { width: 0, height: 2 },
+      shadowOpacity: 0.1,
+      shadowRadius: 8,
+      elevation: 5,
+    },
+    title: {
+      fontSize: 24,
+      fontWeight: 'bold',
+      color: '#00573F',
+      textAlign: 'center',
+      marginBottom: 32,
+    },
+    input: {
+      height: 55,
+      borderColor: '#00573F',
+      borderWidth: 1.5,
+      borderRadius: 8,
+      marginBottom: 16,
+      paddingHorizontal: 16,
+      fontSize: 16,
+      color: colors.text,
+      backgroundColor: colors.card,
+    },
+    button: {
+      backgroundColor: '#F7941D',
+      borderRadius: 8,
+      height: 55,
+      justifyContent: 'center',
+      alignItems: 'center',
+    },
+    buttonText: {
+      color: '#FFFFFF',
+      fontWeight: 'bold',
+      fontSize: 16,
+      textTransform: 'uppercase',
+    },
+    errorText: {
+      color: colors.notification,
+      textAlign: 'center',
+      marginBottom: 12,
+      minHeight: 20,
+    },
+    errorPlaceholder: {
+      minHeight: 20,
+      marginBottom: 12,
+    },
+  });
+
   return (
     <KeyboardAvoidingView
-        // Ajusta a tela para o teclado não cobrir os inputs
-        behavior={Platform.OS === "ios" ? "padding" : "height"}
-        style={styles.container}
+      behavior={Platform.OS === "ios" ? "padding" : "height"}
+      style={styles.container}
     >
       <View style={styles.card}>
         <Text style={styles.title}>Seja bem vindo!</Text>
 
-        <TextInput
-          style={styles.input}
-          placeholder="Login"
-          value={username}
-          onChangeText={setUsername}
-          placeholderTextColor="#999"
-          autoCapitalize="none"
+        {error && <Text style={styles.errorText}>{error}</Text>}
+
+        <Controller
+          control={control}
+          name="username"
+          render={({ field: { onChange, onBlur, value } }) => (
+            <TextInput
+              style={styles.input}
+              placeholder="Usuário"
+              placeholderTextColor="#999"
+              onBlur={onBlur}
+              onChangeText={onChange}
+              value={value}
+              autoCapitalize="none"
+            />
+          )}
         />
+        {errors.username && <Text style={styles.errorText}>{errors.username.message}</Text>}
 
-        <TextInput
-          style={styles.input}
-          placeholder="Senha"
-          value={password}
-          onChangeText={setPassword}
-          secureTextEntry
-          placeholderTextColor="#999"
+        <Controller
+          control={control}
+          name="password"
+          render={({ field: { onChange, onBlur, value } }) => (
+            <TextInput
+              style={styles.input}
+              placeholder="Senha"
+              placeholderTextColor="#999"
+              onBlur={onBlur}
+              onChangeText={onChange}
+              value={value}
+              secureTextEntry
+            />
+          )}
         />
+        {errors.password && <Text style={styles.errorText}>{errors.password.message}</Text>}
 
-        <TouchableOpacity style={styles.forgotPasswordContainer}>
-             <Text style={styles.forgotPasswordText}>Redefinir senha</Text>
-        </TouchableOpacity>
-
-        {/* Exibe a mensagem de erro ou um espaço reservado para evitar que o layout "pule" */}
-        {error ? <Text style={styles.error}>{error}</Text> : <View style={styles.errorPlaceholder} />}
-
-        <TouchableOpacity style={styles.button} onPress={handleLogin} accessibilityLabel="Botão de Entrar">
-            <Text style={styles.buttonText}>ENTRAR</Text>
+        <TouchableOpacity style={styles.button} onPress={handleSubmit(handleLogin)} accessibilityLabel="Botão de Entrar">
+          <Text style={styles.buttonText}>ENTRAR</Text>
         </TouchableOpacity>
       </View>
     </KeyboardAvoidingView>
   );
-}
-
-// OBS: Os valores de cores (ex: '#F7941D') foram extraídos da imagem.
-// É uma boa prática substituí-los pelas variáveis do seu arquivo de tema (ex: COLORS.accent).
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: '#f0f2f5', // Fundo cinza claro para destacar o card
-    padding: SPACING || 20, // Usa o espaçamento do tema ou um valor padrão
-  },
-  card: {
-    backgroundColor: '#FFFFFF', // ou COLORS.white
-    borderRadius: 16,
-    padding: SPACING ? SPACING * 1.5 : 24,
-    width: '100%',
-    shadowColor: '#000',
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
-    shadowOpacity: 0.1,
-    shadowRadius: 8,
-    elevation: 5, // Sombra para Android
-  },
-  title: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    color: '#00573F', // Verde escuro da imagem (substituir por COLORS.primary)
-    textAlign: 'center',
-    marginBottom: SPACING ? SPACING * 2 : 32,
-  },
-  input: {
-    height: 55,
-    borderColor: '#00573F', // Borda verde escura
-    borderWidth: 1.5,
-    borderRadius: 8,
-    marginBottom: SPACING || 16,
-    paddingHorizontal: SPACING || 16,
-    fontSize: 16,
-  },
-  forgotPasswordContainer: {
-    alignSelf: 'center',
-    marginBottom: SPACING ? SPACING / 2 : 8,
-  },
-  forgotPasswordText: {
-    color: '#555',
-    fontSize: 14,
-  },
-  button: {
-    backgroundColor: '#F7941D', // Laranja da imagem (substituir por COLORS.accent)
-    borderRadius: 8,
-    height: 55,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  buttonText: {
-    color: '#FFFFFF', // ou COLORS.white
-    fontWeight: 'bold',
-    fontSize: 16,
-    textTransform: 'uppercase',
-  },
-  error: {
-    color: COLORS.ERROR || 'red', // Cor de erro do tema ou vermelho padrão
-    textAlign: 'center',
-    marginBottom: 12,
-    minHeight: 20,
-  },
-  errorPlaceholder: {
-    minHeight: 20,
-    marginBottom: 12,
-  }
-});
+};
 
 export default LoginScreen;
