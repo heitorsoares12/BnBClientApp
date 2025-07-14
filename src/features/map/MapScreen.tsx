@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { View, Text, StyleSheet, ActivityIndicator, useColorScheme, Alert } from 'react-native';
-import { Marker } from 'react-native-maps';
+import { Marker, Region } from 'react-native-maps';
 import Clustering from 'react-native-map-clustering';
 import UserDetailsCard from './components/UserDetailsCard';
 import { useUsers } from '../../contexts/UsersContext';
@@ -12,12 +12,7 @@ import Geolocation from '@react-native-community/geolocation';
 const MapScreen = () => {
   const { users, loading, error, fetchUsers } = useUsers();
   const [selectedUser, setSelectedUser] = useState<User | null>(null);
-  const [region, setRegion] = useState<any>({
-    latitude: -23.5505,
-    longitude: -46.6333,
-    latitudeDelta: 0.0922,
-    longitudeDelta: 0.0421,
-  });
+  const [region, setRegion] = useState<Region | null>(null);
   const scheme = useColorScheme();
   const colors = getColors(scheme);
 
@@ -90,7 +85,7 @@ const MapScreen = () => {
     },
   });
 
-  if (loading) {
+  if (loading || !region) {
     return (
       <View style={styles.centered}>
         <ActivityIndicator size="large" color={colors.primary} />
@@ -143,7 +138,7 @@ const MapScreen = () => {
           );
         })}
       </Clustering>
-      {!region && users.length === 0 && !loading && (
+      {users.length === 0 && !loading && region && (
         <View style={styles.centered}>
           <Text style={{ color: colors.text }}>Nenhum usuário disponível para exibir no mapa.</Text>
         </View>
